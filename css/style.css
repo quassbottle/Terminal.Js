@@ -1,0 +1,64 @@
+:root {
+    --color-background: #300a25;
+
+    --color-console-text: #fff1f6;
+    --color-console-username: #a7c249;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    background-color: var(--color-background);
+    font-family: cursor, monospace;
+}
+
+.console {
+    margin: 20px;
+    color: var(--color-console-text);
+    text-overflow: clip;
+}
+
+.console p {
+    margin: 0;
+}
+
+.console span.username {
+    color: var(--color-console-username);
+    font-weight: bold;
+}
+
+.console textarea {
+    position: absolute;
+    left: -100vw;
+}
+
+.console b.selection {
+
+}
+
+.console b.cursor {
+    color: var(--color-console-text);
+    font-weight: normal;
+    position: relative;
+}
+
+.console b:before {
+    position: absolute;
+    content: "";
+    height: 3px;
+    width: 9px;
+    background-color: var(--color-console-text);
+    top: 15px;
+    opacity: 0.8;
+    animation: blinker 1s step-start infinite;
+}
+
+.console console__input {
+    white-space: pre;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
