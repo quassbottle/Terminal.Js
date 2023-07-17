@@ -1,17 +1,23 @@
 export class ConsoleHandler {
     fastOutput;
+    hostname;
+    username;
+
     #consoleLog;
     #consoleInput;
     #consoleOutputHandler;
     #userInputLog;
     #commandHandler;
 
-    constructor(consoleLog, consoleInput) {
+    constructor(hostname, username, consoleLog, consoleInput) {
         this.#consoleOutputHandler = new ConsoleOutputHandler(consoleLog);
         this.#consoleInput = consoleInput;
         this.#consoleLog = consoleLog;
         this.#userInputLog = [];
         this.#commandHandler = new ConsoleCommandHandler(this);
+
+        this.hostname = hostname;
+        this.username = username;
 
         this.changeFastOutput(false);
     }
@@ -28,7 +34,7 @@ export class ConsoleHandler {
         this.#consoleOutputHandler.stopDelayedOutput();
 
         let newLine = document.createElement("p");
-        newLine.innerHTML = `<span class=\"username\">test@vpive.ru</span>:~$ `;
+        newLine.innerHTML = `<span class=\"username\">${this.username}@${this.hostname}</span>:~$ `;
         newLine.innerHTML += this.#consoleInput.innerHTML;
         this.#consoleLog.append(newLine);
 
@@ -151,12 +157,12 @@ class ConsoleCommandHandler {
             consoleHandler.clear();
             }, "clear", "clr"));
 
-        this.#commands.push(new ConsoleCommand("output-speed", "Toggle typewriter effect", () => {
+        this.#commands.push(new ConsoleCommand("output-speed", "Toggle typewriter effect", "",() => {
             this.consoleHandler.changeFastOutput(!this.consoleHandler.fastOutput);
             this.consoleHandler.writeLine(`Changed fast output to "${this.consoleHandler.fastOutput}".`);
             }, "outs"));
 
-        this.#commands.push(new ConsoleCommand("help", "Help command", (args) => {
+        this.#commands.push(new ConsoleCommand("help", "Help command", "",(args) => {
             this.consoleHandler.writeLine(this.#commands.map(command => {
                 return `${command.title} - ${command.description}`;
             }).join("\n"));
