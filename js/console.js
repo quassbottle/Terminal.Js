@@ -4,12 +4,14 @@ export class ConsoleHandler {
     #consoleInput;
     #consoleOutputHandler;
     #userInputLog;
+    #commandHandler;
 
     constructor(consoleLog, consoleInput) {
         this.#consoleOutputHandler = new ConsoleOutputHandler(consoleLog);
         this.#consoleInput = consoleInput;
         this.#consoleLog = consoleLog;
         this.#userInputLog = [];
+        this.#commandHandler = new ConsoleCommandHandler(this);
 
         this.changeFastOutput(false);
     }
@@ -34,6 +36,8 @@ export class ConsoleHandler {
         this.#consoleInput.innerHTML = "";
 
         this.#userInputLog.push(userInput);
+
+        this.#commandHandler.handleInput(userInput);
 
         return userInput;
     }
@@ -63,7 +67,7 @@ class ConsoleInputHandler {
     constructor(consoleInput) {
         this.consoleInput = consoleInput;
     }
-
+    // todo: may get deprecated
 }
 
 class ConsoleOutputHandler {
@@ -130,23 +134,91 @@ class DelayedOutputHandler {
     }
 }
 
-class CommandHandler {
+class ConsoleCommandHandler {
+    consoleHandler;
+    #commands;
 
+    constructor(consoleHandler) {
+        this.consoleHandler = consoleHandler;
+
+        this.#commands = []; // todo: gonna move it to different file to avoid bloating console logic
+
+        this.#commands.push(new ConsoleCommand("echo", "Echoes text", "{text}", (args) => {
+            consoleHandler.writeLine(args);
+        }));
+
+        this.#commands.push(new ConsoleCommand("cls", "Clears console", "", () => {
+            consoleHandler.clear();
+            }, "clear", "clr"));
+
+        this.#commands.push(new ConsoleCommand("output-speed", "Toggle typewriter effect", () => {
+            this.consoleHandler.changeFastOutput(!this.consoleHandler.fastOutput);
+            this.consoleHandler.writeLine(`Changed fast output to "${this.consoleHandler.fastOutput}".`);
+            }, "outs"));
+
+        this.#commands.push(new ConsoleCommand("help", "Help command", (args) => {
+            this.consoleHandler.writeLine(this.#commands.map(command => {
+                return `${command.title} - ${command.description}`;
+            }).join("\n"));
+        }));
+    }
+
+    handleInput(input) {
+        const cmd = input.split(' ')[0];
+        const args = input.substring(5);
+
+        try {
+            this.#commands.find(value => {
+                if (value.title === cmd) {
+                    return value;
+                } else if (value.alias.includes(cmd)) {
+                    return value;
+                }
+            }).execute(args);
+        } catch (e) {
+            this.consoleHandler.writeLine(`Unknown executable nor command is "${input}".`)
+        }
+    }
+}
+
+class ConsoleCommandArguments {
+    // todo: add arguments parsing
 }
 
 export class ConsoleCommand {
-    title;
-    description;
-    action;
-    constructor(title, description, action) {
-        this.title = title;
-        this.description = description;
-        this.action = action;
+    #title;
+    #alias;
+    #description;
+    #usage;
+    #action;
+    constructor(title, description, usage, action, ...alias) {
+        this.#title = title;
+        this.#alias = alias;
+        this.#description = description;
+        this.#action = action;
     }
 
     execute(args) {
         this.action(args);
     }
-}
 
-// todo
+    get title() {
+        return this.#title;
+    }
+
+    get alias() {
+        return this.#alias;
+    }
+
+    get description() {
+        return this.#description;
+    }
+
+    get usage() {
+        return this.#usage;
+    }
+
+    get action() {
+        return this.#action;
+    }
+}

@@ -20,6 +20,7 @@ body {
 
 .console p {
     margin: 0;
+    white-space: pre-line;
 }
 
 .console span.username {
