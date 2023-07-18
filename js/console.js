@@ -5,12 +5,12 @@ export class ConsoleHandler {
 
     #consoleLog;
     #consoleInput;
-    #consoleOutputHandler;
+    #outputHandler;
     #userInputLog;
     #commandHandler;
 
     constructor(hostname, username, consoleLog, consoleInput) {
-        this.#consoleOutputHandler = new ConsoleOutputHandler(consoleLog);
+        this.#outputHandler = new ConsoleOutputHandler(consoleLog);
         this.#consoleInput = consoleInput;
         this.#consoleLog = consoleLog;
         this.#userInputLog = [];
@@ -23,15 +23,15 @@ export class ConsoleHandler {
     }
 
     writeLine(text) {
-        this.#consoleOutputHandler.writeLine(text);
+        this.#outputHandler.writeLine(text);
     }
 
     clear() {
-        this.#consoleOutputHandler.clear();
+        this.#outputHandler.clear();
     }
 
     submit() {
-        this.#consoleOutputHandler.stopDelayedOutput();
+        this.#outputHandler.stopDelayedOutput();
 
         let newLine = document.createElement("p");
         newLine.innerHTML = `<span class=\"username\">${this.username}@${this.hostname}</span>:~$ `;
@@ -49,13 +49,13 @@ export class ConsoleHandler {
     }
 
     changeFastOutput(value) {
-        this.#consoleOutputHandler.fastOutput = value;
+        this.#outputHandler.fastOutput = value;
         this.fastOutput = value;
     }
 
     set fastOutput(value) {
         console.log(value);
-        this.#consoleOutputHandler.fastOutput = value;
+        this.#outputHandler.fastOutput = value;
         this.fastOutput = value;
     }
 
@@ -64,7 +64,7 @@ export class ConsoleHandler {
     }
 
     get output() {
-        return this.#consoleOutputHandler;
+        return this.#outputHandler;
     }
 }
 
@@ -153,6 +153,10 @@ class ConsoleCommandHandler {
             consoleHandler.writeLine(args);
         }));
 
+        this.#commands.push(new ConsoleCommand("eval", "Eval input", "{text}", (args) => {
+            eval(args);
+        }));
+
         this.#commands.push(new ConsoleCommand("cls", "Clears console", "", () => {
             consoleHandler.clear();
             }, "clear", "clr"));
@@ -174,6 +178,7 @@ class ConsoleCommandHandler {
         const args = input.substring(5);
 
         try {
+            if (input === "") return;
             this.#commands.find(value => {
                 if (value.title === cmd) {
                     return value;
