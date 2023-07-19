@@ -27,6 +27,10 @@ function main() {
             e.preventDefault();
         }
     })
+
+    consoleInput.addEventListener("click", e => {
+       consoleTypeInput.focus();
+    });
 }
 
 main();

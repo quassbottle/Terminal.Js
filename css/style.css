@@ -11,6 +11,11 @@ body {
     font-family: cursor, monospace;
 }
 
+[contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
 .console {
     margin: 20px;
     color: var(--color-console-text);
@@ -63,3 +68,4 @@ body {
         opacity: 0;
     }
 }
+
