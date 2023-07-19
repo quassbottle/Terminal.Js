@@ -22,8 +22,8 @@ export class ConsoleHandler {
         this.changeFastOutput(false);
     }
 
-    writeLine(text) {
-        this.#outputHandler.writeLine(text);
+    writeLine(text, fast = false) {
+        this.#outputHandler.writeLine(text, fast);
     }
 
     clear() {
@@ -86,8 +86,8 @@ class ConsoleOutputHandler {
         this.consoleLog = consoleLog;
     }
 
-    writeLine(string) {
-        this.fastOutput ? this.writeLineFast(string) : this.writeLineDelayed(string);
+    writeLine(string, fast = false) {
+        this.fastOutput || fast ? this.writeLineFast(string) : this.writeLineDelayed(string);
     }
 
     writeLineDelayed(text, delay = 25) {

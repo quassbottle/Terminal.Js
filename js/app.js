@@ -19,7 +19,7 @@ function main() {
     
     * For a list of available commands type "help".
     
-    `)
+    `, true);
 
     window.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
