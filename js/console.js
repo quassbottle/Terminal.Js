@@ -54,7 +54,6 @@ export class ConsoleHandler {
     }
 
     set fastOutput(value) {
-        console.log(value);
         this.#outputHandler.fastOutput = value;
         this.fastOutput = value;
     }
