@@ -38,7 +38,7 @@ export class ConsoleHandler {
         newLine.innerHTML += this.#consoleInput.innerHTML;
         this.#consoleLog.append(newLine);
 
-        let userInput = this.#consoleInput.innerHTML;
+        let userInput = this.#consoleInput.textContent;
         this.#consoleInput.innerHTML = "";
 
         this.#userInputLog.push(userInput);
