@@ -23,7 +23,7 @@ function main() {
 
     window.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-            const input = terminal.submit();
+            if (document.activeElement === consoleTypeInput) terminal.submit();
             e.preventDefault();
         }
     })
