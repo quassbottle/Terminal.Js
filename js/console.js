@@ -196,7 +196,7 @@ class ConsoleCommandHandler {
     }
 
     handleInput(input) {
-        const cmd = input.split(' ')[0];
+        const cmd = input.split(' ')[0].toLowerCase();
         const args = input.substring(5);
 
         try {

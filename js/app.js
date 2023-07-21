@@ -35,7 +35,6 @@ function main() {
         scanlines.hidden = !scanlines.hidden;
     }));
 
-
     window.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             if (document.activeElement === consoleTypeInput) {
