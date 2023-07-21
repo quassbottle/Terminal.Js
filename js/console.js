@@ -118,7 +118,7 @@ class ConsoleOutputHandler {
     }
 }
 
-class DelayedOutputHandler {
+class DelayedOutputHandler { // todo: fix output of this D:
     interval;
 
     bufferedText;
@@ -190,8 +190,12 @@ class ConsoleCommandHandler {
         }));
 
         this.#commands.push(new ConsoleCommand("create", "Create custom command with code specified", "code", code => {
-            if (!this.commandExists("script")) this.addCommand(new ConsoleCommand("script", "User custom command", "",() => {
-                new Function(code)();
+            if (this.commandExists("script")) {
+                this.consoleHandler.writeLine("Command updated");
+                this.removeCommand("script");
+            } else this.consoleHandler.writeLine("Command created");
+            this.addCommand(new ConsoleCommand("script", "User custom command", "",() => {
+                new Function("terminal", code)(consoleHandler);
             }))
         }));
     }
@@ -199,6 +203,10 @@ class ConsoleCommandHandler {
     addCommand(command) {
         if (command.constructor.name === "ConsoleCommand") this.#commands.push(command);
         else throw TypeError("Only ConsoleCommand is allowed to import");
+    }
+
+    removeCommand(commandTitle) {
+        this.#commands.splice(this.#commands.indexOf(this.#commands.find(value => value.title === commandTitle)), 1);
     }
 
     commandExists(commandTitle) {
