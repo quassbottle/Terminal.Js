@@ -86,9 +86,11 @@ class ConsoleInputHandler {
 class ConsoleOutputHandler {
     consoleLog;
     delayedOutputHandler;
+    delayedOutputQueue;
     fastOutput;
     constructor(consoleLog) {
         this.delayedOutputHandler = new DelayedOutputHandler();
+        this.delayedOutputQueue = new DelayedOutputQueue();
         this.fastOutput = false;
         this.consoleLog = consoleLog;
     }
@@ -100,7 +102,8 @@ class ConsoleOutputHandler {
     writeLineDelayed(text, delay = 25) {
         let newLine = document.createElement("p");
         this.consoleLog.append(newLine);
-        this.delayedOutputHandler.begin(newLine, text, delay);
+        this.delayedOutputQueue.begin(newLine, text, delay);
+        //this.delayedOutputHandler.begin(newLine, text, delay);
     }
 
     writeLineFast(text) {
@@ -110,11 +113,43 @@ class ConsoleOutputHandler {
     }
 
     stopDelayedOutput() {
-        this.delayedOutputHandler.stop();
+        //this.delayedOutputHandler.stop();
+        this.delayedOutputQueue.stopAll();
     }
 
     clear() {
         this.consoleLog.innerHTML = "";
+    }
+}
+
+class DelayedOutputQueue {
+    #handlers;
+    length;
+
+    constructor() {
+        this.#handlers = [];
+        this.length = 0;
+    }
+
+    begin(element, text, speed = 50) {
+        let output = new DelayedOutputHandler();
+        output.begin(element, text, speed);
+        this.#handlers.push(output);
+        length++;
+    }
+
+    shiftStop() {
+        this.#handlers.shift();
+        length--;
+    }
+
+    stopAll() {
+        this.#handlers.forEach(handler => handler.stop());
+        length = 0;
+    }
+
+    get isWriting() {
+        return length !== 0;
     }
 }
 
