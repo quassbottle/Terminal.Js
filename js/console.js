@@ -34,7 +34,7 @@ export class ConsoleHandler {
         this.#outputHandler.stopDelayedOutput();
 
         let newLine = document.createElement("p");
-        newLine.innerHTML = `<span class=\"username\">${this.username}@${this.hostname}</span>:~$ `;
+        newLine.innerHTML = `<span class=\"username\">[${this.username}@${this.hostname}]</span>: `;
         newLine.innerHTML += this.#consoleInput.innerHTML;
         this.#consoleLog.append(newLine);
 
@@ -58,12 +58,20 @@ export class ConsoleHandler {
         this.fastOutput = value;
     }
 
+    get currentUserInput() {
+        return this.#consoleInput.textContent;
+    }
+
     get fastOutput() {
         return this.fastOutput;
     }
 
     get output() {
         return this.#outputHandler;
+    }
+
+    get commandHandler() {
+        return this.#commandHandler;
     }
 }
 
@@ -116,6 +124,8 @@ class DelayedOutputHandler {
     bufferedText;
     bufferedElement;
 
+    #isWriting;
+
     begin(element, text, speed = 50) {
         this.bufferedText = text;
         this.bufferedElement = element;
@@ -123,11 +133,14 @@ class DelayedOutputHandler {
         element.textContent = "";
         let currentIndex = 0;
 
-        this.interval = setInterval(function() {
+        this.#isWriting = true;
+
+        this.interval = setInterval(() => {
             if (currentIndex < text.length) {
                 element.textContent += text[currentIndex++];
             } else {
-                clearInterval(this);
+                clearInterval(this.interval);
+                this.#isWriting = false;
             }
         }, speed);
     }
@@ -136,6 +149,11 @@ class DelayedOutputHandler {
         if (this.interval === undefined) return;
         this.bufferedElement.textContent = this.bufferedText;
         clearInterval(this.interval);
+        this.#isWriting = false;
+    }
+
+    get isWriting() {
+        return this.#isWriting;
     }
 }
 
@@ -148,11 +166,11 @@ class ConsoleCommandHandler {
 
         this.#commands = []; // todo: gonna move it to different file to avoid bloating console logic
 
-        this.#commands.push(new ConsoleCommand("echo", "Echoes text", "{text}", (args) => {
+        this.#commands.push(new ConsoleCommand("echo", "Echoes text", "text", (args) => {
             consoleHandler.writeLine(args);
         }));
 
-        this.#commands.push(new ConsoleCommand("eval", "Eval input", "{text}", (args) => {
+        this.#commands.push(new ConsoleCommand("eval", "Eval input", "code", (args) => {
             eval(args);
         }));
 
@@ -167,9 +185,14 @@ class ConsoleCommandHandler {
 
         this.#commands.push(new ConsoleCommand("help", "Help command", "",(args) => {
             this.consoleHandler.writeLine(this.#commands.map(command => {
-                return `${command.title} - ${command.description}`;
+                return `- ${command.title} ${command.usage === undefined || command.usage === "" ? "" : "{" + command.usage + "}"} - ${command.description}`;
             }).join("\n"));
         }));
+    }
+
+    addCommand(command) {
+        if (command.constructor.name === "ConsoleCommand") this.#commands.push(command);
+        else throw TypeError("Only ConsoleCommand is allowed to import");
     }
 
     handleInput(input) {
@@ -206,6 +229,7 @@ export class ConsoleCommand {
         this.#alias = alias;
         this.#description = description;
         this.#action = action;
+        this.#usage = usage;
     }
 
     execute(args) {
