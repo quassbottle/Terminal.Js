@@ -42,7 +42,7 @@ function main() {
     window.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             if (document.activeElement === consoleTypeInput) {
-                if (terminal.currentUserInput === "" && terminal.output.delayedOutputHandler.isWriting) terminal.output.stopDelayedOutput();
+                if (terminal.currentUserInput === "" && terminal.output.delayedOutputQueue.isWriting) terminal.output.stopDelayedOutput();
                 else {
                     logs.push(terminal.submit());
                     logPointer++;
