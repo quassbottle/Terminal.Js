@@ -185,7 +185,7 @@ class ConsoleCommandHandler {
 
         this.#commands.push(new ConsoleCommand("help", "Help command", "",(args) => {
             this.consoleHandler.writeLine(this.#commands.map(command => {
-                return `- ${command.title} ${command.usage === undefined || command.usage === "" ? "" : "{" + command.usage + "}"} - ${command.description}`;
+                return `- ${command.title} ${command.usage === undefined || command.usage === "" ? "" : "{" + command.usage + "}"} - ${command.description} ${command.alias === undefined || command.alias.length === 0 ? "" : "(alias: " + command.alias.join(", ") + ")"}`;
             }).join("\n"));
         }));
     }

@@ -27,13 +27,14 @@ function main() {
     * For a list of available commands type "help".
     * Github repository: https://github.com/quassbottle/Terminal.Js
     
-    `, true);
+`);
 
     localStorage["lastLogin"] = new Date().toDateString();
 
     terminal.commandHandler.addCommand(new ConsoleCommand("scanlines", "Disable scanlines effect", "", () => {
         scanlines.hidden = !scanlines.hidden;
     }));
+
 
     window.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
