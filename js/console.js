@@ -183,10 +183,16 @@ class ConsoleCommandHandler {
             this.consoleHandler.writeLine(`Changed fast output to "${this.consoleHandler.fastOutput}".`);
             }, "outs"));
 
-        this.#commands.push(new ConsoleCommand("help", "Help command", "",(args) => {
+        this.#commands.push(new ConsoleCommand("help", "Help command", "",() => {
             this.consoleHandler.writeLine(this.#commands.map(command => {
                 return `- ${command.title} ${command.usage === undefined || command.usage === "" ? "" : "{" + command.usage + "}"} - ${command.description} ${command.alias === undefined || command.alias.length === 0 ? "" : "(alias: " + command.alias.join(", ") + ")"}`;
             }).join("\n"));
+        }));
+
+        this.#commands.push(new ConsoleCommand("create", "Create custom command with code specified", "code", code => {
+            if (!this.commandExists("script")) this.addCommand(new ConsoleCommand("script", "User custom command", "",() => {
+                new Function(code)();
+            }))
         }));
     }
 
@@ -195,11 +201,14 @@ class ConsoleCommandHandler {
         else throw TypeError("Only ConsoleCommand is allowed to import");
     }
 
+    commandExists(commandTitle) {
+        return this.#commands.find(value => value.title === commandTitle) !== undefined;
+    }
+
     handleInput(input) {
         input = input.replaceAll('\xa0', " ");
         const cmd = input.split(' ')[0].toLowerCase();
-        const args = input.substring(5);
-        console.log(cmd[4]);
+        const args = input.substring(cmd.length);
 
         try {
             if (input === "") return;
@@ -211,6 +220,7 @@ class ConsoleCommandHandler {
                 }
             }).execute(args);
         } catch (e) {
+            console.log(e);
             this.consoleHandler.writeLine(`Unknown executable nor command is "${input}".`)
         }
     }
