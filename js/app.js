@@ -18,8 +18,11 @@ function main() {
 
     const terminal = new ConsoleHandler(hostname, username, consoleLog, consoleTypeInput);
 
+    let date;
+
     if (localStorage["lastLogin"] === undefined) {
-        localStorage["lastLogin"] = new Date().toDateString();
+        date = new Date();
+        localStorage["lastLogin"] = date.toDateString() + " " + date.toLocaleTimeString();
     }
 
     terminal.writeLine(`Welcome to Terminal.JS! Last login: ${localStorage["lastLogin"]} 
@@ -29,7 +32,8 @@ function main() {
     
 `);
 
-    localStorage["lastLogin"] = new Date().toDateString();
+    date = new Date();
+    localStorage["lastLogin"] = date.toDateString() + " " + date.toLocaleTimeString();
 
     terminal.commandHandler.addCommand(new ConsoleCommand("scanlines", "Disable scanlines effect", "", () => {
         scanlines.hidden = !scanlines.hidden;
