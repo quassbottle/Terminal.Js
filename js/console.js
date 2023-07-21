@@ -196,8 +196,10 @@ class ConsoleCommandHandler {
     }
 
     handleInput(input) {
+        input = input.replaceAll('\xa0', " ");
         const cmd = input.split(' ')[0].toLowerCase();
         const args = input.substring(5);
+        console.log(cmd[4]);
 
         try {
             if (input === "") return;
