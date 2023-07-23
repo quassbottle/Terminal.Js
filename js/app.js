@@ -1,4 +1,4 @@
-import {ConsoleCommand, ConsoleHandler} from "./console.js";
+import {ConsoleCommand, ConsoleHandler}from "./console.js";
 
 const consoleContainer = document.querySelector(".console");
 const consoleInput = consoleContainer.querySelector(".console__input");
@@ -45,7 +45,7 @@ function main() {
                 if (terminal.currentUserInput === "" && terminal.output.delayedOutputQueue.isWriting) terminal.output.stopDelayedOutput();
                 else {
                     logs.push(terminal.submit());
-                    logPointer++;
+                    logPointer = logs.length;
                 }
             }
             e.preventDefault();

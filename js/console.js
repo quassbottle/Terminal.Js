@@ -269,8 +269,110 @@ class ConsoleCommandHandler {
     }
 }
 
-class ConsoleCommandArguments {
-    // todo: add arguments parsing
+export class ConsoleCommandArgumentsTemplate {
+    #params;
+    constructor(params) {
+        this.#params = params ?? [];
+    }
+
+    add(name, type) {
+        this.#params.push({
+            name: name, type: type
+        });
+        return this;
+    }
+
+    hasParam(name) {
+        return this.#params.find(param => param.name === name) !== undefined;
+    }
+
+    get params() {
+        return this.#params;
+    }
+}
+
+export class ConsoleCommandArgumentsParser {
+    static parse(template, string) {
+        let split = string.split(" ");
+        let result = [];
+        let lastIndexOfParam = 0;
+        for (let i in template.params) {
+            const param = template.params[i];
+            const indexOfParam = split.indexOf("-" + param.name);
+            lastIndexOfParam = Math.max(lastIndexOfParam, indexOfParam);
+            switch (param.type) {
+                case "bool": {
+                    const bools = ["1", "0", "true", "false"];
+                    if (bools.includes(split[indexOfParam + 1])) {
+                        result.push({
+                            param: param.name,
+                            value: split[indexOfParam + 1] === "1" || split[indexOfParam + 1] === true
+                        })
+                    } else {
+                        result.push({
+                            param: param.name,
+                            value: true
+                        })
+                    }
+                    break;
+                }
+                case "number": {
+                    const number = split[indexOfParam + 1] - 0;
+                    if (isNaN(number)) {
+                        throw Error("Bad number");
+                    }
+                    result.push({
+                        param: param.name,
+                        value: number
+                    })
+                    break;
+                }
+                case "string": {
+                    const next = split[indexOfParam + 1];
+                    const spliced = split.toSpliced(0, indexOfParam + 1);
+                    const indexOfNextParam = spliced.findIndex(stringParam => template.hasParam(stringParam.substring(1)));
+                    /*if (indexOfNextParam === undefined || indexOfNextParam === -1) {
+                        result.push({
+                            param: param.name,
+                            value: next
+                        });
+                        break;
+                    }*/
+                    if (indexOfNextParam !== -1) {
+                        const splicedAgain = spliced.toSpliced(indexOfNextParam);
+                        let joined = splicedAgain.join(" ");
+                        if (joined[0] === '"' && joined[joined.length - 1] === '"') {
+                            joined = joined.substring(1).substring(0, joined.length - 2)
+                        }
+                        result.push({
+                            param: param.name,
+                            value: joined
+                        });
+                        break;
+                    }
+                    else {
+                        const lastString = spliced[spliced.length - 1];
+                        let joined = spliced.join(" ");
+                        if (lastString[lastString.length - 1] === '"') {
+                            result.push({
+                                param: param.name,
+                                value: joined.substring(1).substring(0, joined.length - 2)
+                            });
+                            break;
+                        }
+                        result.push({
+                            param: param.name,
+                            value: joined
+                        });
+                        break;
+                    }
+
+                }
+            }
+        }
+        result.push("_defaultParam", split.toSpliced(0, lastIndexOfParam + 2).join(" "));
+        return result;
+    }
 }
 
 export class ConsoleCommand {
